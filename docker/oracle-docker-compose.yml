@@ -1,0 +1,34 @@
+version: '2'
+services:
+  oracle11g:
+    image: alexeiled/docker-oracle-xe-11g
+    ports:
+      - "1521:1521"
+      - "18080:8080"
+    expose: 
+      - "1521"
+      - "18080"
+    volumes:
+      - /opt/docker_data/oracle/local-initdb:/etc/entrypoint-initdb.d
+      - /opt/docker_data/oracle/oradata/XE:/usr/lib/oracle/xe/oradata/XE
+
+##https://hub.docker.com/r/alexeiled/docker-oracle-xe-11g/
+#Connect database with following setting:
+
+#hostname: localhost
+#port: 1521
+#sid: xe
+#username: system
+#password: oracle
+#Password for SYS user
+
+#oracle
+#Connect to Oracle Application Express web management console with following settings:
+
+#url: http://localhost:18080/apex
+#workspace: internal
+#user: admin
+#password: oracle  修改为 admin  
+
+
+

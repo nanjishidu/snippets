@@ -1,0 +1,48 @@
+## vue photos app
+http://app.gophper.com {
+    log /opt/logs/app.gophper.com.access.log
+    gzip
+    root  /home/www-root/app.gophper.com/dist
+}
+## gitea 
+git.gophper.com {
+    log   /opt/logs/git.gophper.com.access.log
+    gzip
+    tls example@gmail.com
+    proxy / localhost:8083 {
+        header_upstream Host {host}
+        header_upstream X-Real-IP {remote}
+        header_upstream X-Forwarded-For {remote}
+        header_upstream X-Forwarded-Proto {scheme}
+    }
+}
+## kpass 密码管理
+kpass.gophper.com {
+    log   /opt/logs/kpass.gophper.com.access.log
+    gzip
+    tls example@gmail.com
+    proxy / localhost:9988 {
+        header_upstream Host {host}
+        header_upstream X-Real-IP {remote}
+        header_upstream X-Forwarded-For {remote}
+        header_upstream X-Forwarded-Proto {scheme}
+    }
+}
+## blog
+gophper.com, www.gophper.com {
+    log   /opt/logs/www.gophper.com.access.log
+    gzip
+    tls example@gmail.com
+    redir https://nanjishidu.me{uri}
+}
+## book share
+book.gophper.com {
+    log   /opt/logs/book.gophper.com.access.log
+    gzip
+    tls example@gmail.com
+    filemanager / {
+        show /opt/data/book/
+        allow_new true
+        allow_edit false
+    }
+}

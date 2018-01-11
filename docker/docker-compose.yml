@@ -1,0 +1,109 @@
+version: '2'
+services:
+#####################################################################################
+#docker registry docker 私有仓库 对外5000 端口
+# 将本地alpine镜像提交docker私有仓库
+# docker images
+# docker tag 7328f6f8b418 127.0.0.1:5000/alpine
+# docker push 127.0.0.1:5000/alpine
+# docker pull 127.0.0.1:5000/alpine
+# docker images
+  docker-registry:
+    image: registry:latest
+    restart: always
+    ports:
+      - "5000:5000"
+    expose:
+      - "5000"
+    volumes:
+       - /opt/docker_data/registry:/tmp/registry
+#####################################################################################
+#consul 服务发现
+  consul:
+    image: consul:latest
+    restart: always
+    ports:
+      - "8500:8500"
+    expose: 
+      - "8500"
+#####################################################################################
+#gitea golang开发,xorm作者,类似github
+  gitea:
+    image: gitea/gitea:latest
+    restart: always
+    ports:
+      - "10080:3000"
+      - "10022:22"
+    expose: 
+      - "10080"
+    volumes:
+      - /opt/docker_data/gitea:/data
+#####################################################################################
+#postgresql mysql 数据库，adminer 数据库web可视化管理
+  postgresql:
+    image: sameersbn/postgresql:9.6-2
+    environment:
+      DB_NAME: pgdb
+      DB_USER: root
+      DB_PASS: 111111
+    restart: always
+    # ports:
+    #   - "5432:5432"
+    # expose: 
+    #   - "5432"
+    volumes:
+      - /opt/docker_data/postgresql:/var/lib/postgresql
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 111111
+    # ports:
+    #   - "3306:3306"
+    # expose: 
+    #   - "3306"
+    volumes:
+      - /opt/docker_data/mysql/mysql:/var/lib/mysql
+  adminer:
+    image: adminer:latest
+    # image: nanjishidu/adminer
+    # build: ./docker-adminer/4.3
+    ports:
+      - 8080:8080
+    links:
+      - mysql:mysql
+      - postgresql:postgresql
+#####################################################################################
+#nsq golang开发消息队列
+  nsqlookupd:
+    image: nsqio/nsq
+    command: /nsqlookupd
+    ports:
+      - "4160"
+      - "4161"
+  nsqd:
+    image: nsqio/nsq
+    command: /nsqd --lookupd-tcp-address=nsqlookupd:4160
+    ports:
+      - "4150"
+      - "4151"
+  nsqadmin:
+    image: nsqio/nsq
+    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+    ports:
+      - "4171"
+#####################################################################################
+#alpine linux基础镜像 只有不到4M 后期docker会将ubuntu转为alpine
+  alpine:
+    image: alpine:latest
+    restart: always
+    # dns:
+    #   - 8.8.8.8
+    #   - 9.9.9.9
+    # dns_search:
+    #   - dns1.gophper.com
+    #   - dns2.gophper.com
+    # env_file:
+    #   - ./app.env
+    #   - ./web.env
+    # entrypoint: ./entrypoint.sh
+    command: top

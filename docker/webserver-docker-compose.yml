@@ -1,0 +1,22 @@
+version: '2'
+services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 111111
+    volumes:
+      - /opt/docker_data/wwwroot/mysql:/var/lib/mysql
+  webserver:
+    image: saaremaa/webserver:latest
+    restart: always
+    container_name: webserver
+    ports:
+      - 80:80
+    volumes:
+      - /opt/docker_data/wwwroot:/var/www/html/
+    links:
+      - mysql:db
+    depends_on:
+      - mysql

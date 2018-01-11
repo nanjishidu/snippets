@@ -1,0 +1,40 @@
+version: '2'
+services:
+  wekandb:
+    image: mongo:3.2.14
+    restart: always
+    container_name: wekan-db
+    command: mongod --smallfiles --oplogSize 128
+    networks:
+      - wekan-tier
+    expose:
+      - 27017
+    volumes:
+      - wekan-db:/data/db
+      - wekan-db-dump:/dump
+
+  wekan:
+    image: wekanteam/wekan:latest
+    restart: always
+    container_name: wekan-app
+    networks:
+      - wekan-tier
+    ports:
+      - 8085:80
+    environment:
+      - MONGO_URL=mongodb://wekandb:27017/wekan
+      - ROOT_URL=https://wekan.gophper.com
+      - MAIL_URL=smtp://user:pass@mailserver.example.com:25/
+      - MAIL_FROM=wekan-admin@example.com
+    depends_on:
+      - wekandb
+
+volumes:
+  wekan-db:
+    driver: local
+  wekan-db-dump:
+    driver: local
+
+networks:
+  wekan-tier:
+    driver: bridge
